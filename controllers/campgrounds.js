@@ -1,5 +1,5 @@
 const Campground = require("../models/campground");
-const User=require("../models/user");
+const User = require("../models/user");
 module.exports.index = async (req, res) => {
   const campgrounds = await Campground.find({});
   // console.log(campgrounds[0]);
@@ -28,7 +28,7 @@ module.exports.showCampground = async (req, res) => {
   // console.log(user);
 
   // const demo=await Campground.findById(req.params.id);
-// console.log(demo);
+  // console.log(demo);
   const campground = await Campground.findById(req.params.id)
     .populate("author")
     .populate({
@@ -60,6 +60,12 @@ module.exports.updateCampground = async (req, res) => {
   const campground = await Campground.findByIdAndUpdate(id, {
     ...req.body.campground,
   });
+  const imgs = req.files.map((f) => ({
+    url: f.path,
+    filename: f.filename,
+  }));
+  campground.images.push(...imgs);
+  await campground.save();
   req.flash("success", "Successfully updated campground!");
   res.redirect(`/campgrounds/${campground._id}`);
 };
